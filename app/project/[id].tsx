@@ -14,10 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { useEvaluation } from '@/hooks/useEvaluation';
-import { useProjects } from '@/hooks/useProjects';
-import { SAFETY_QUESTIONS, CATEGORY_NAMES } from '@/constants/SafetyQuestions';
-import ScoreButton from '@/components/ui/ScoreButton';
+import { useEvaluation } from '../hooks/useEvaluation';
+import { useProjects } from '../hooks/useProjects';
+import { SAFETY_QUESTIONS, CATEGORY_NAMES } from '../constants/SafetyQuestions';
+import ScoreButton from '../components/ui/ScoreButton';
 
 export default function ProjectEvaluationPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -47,6 +47,21 @@ export default function ProjectEvaluationPage() {
       Alert.alert(title, message, onOk ? [{ text: 'OK', onPress: onOk }] : undefined);
     }
   };
+
+  // Calcular estatísticas de progresso
+  const getProgressStats = () => {
+    const totalQuestions = SAFETY_QUESTIONS.length;
+    const answeredQuestions = evaluation?.answers.length || 0;
+    const pendingQuestions = totalQuestions - answeredQuestions;
+    
+    return {
+      total: totalQuestions,
+      answered: answeredQuestions,
+      pending: pendingQuestions
+    };
+  };
+
+  const progressStats = getProgressStats();
 
   const toggleQuestionExpansion = (questionId: string) => {
     const newExpanded = new Set(expandedQuestions);
@@ -217,7 +232,7 @@ export default function ProjectEvaluationPage() {
     }
 
     try {
-      const PDFService = (await import('@/services/PDFService')).default;
+      const PDFService = (await import('../services/PDFService')).default;
       await PDFService.generatePDF(project, evaluation);
       showWebAlert('Sucesso!', 'Relatório PDF gerado e compartilhado com sucesso.');
     } catch (error) {
@@ -270,11 +285,31 @@ export default function ProjectEvaluationPage() {
           )}
         </View>
         
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreLabel}>Progresso atual:</Text>
-          <Text style={[styles.score, { color: getScoreColor(evaluation.percentage) }]}>
-            {evaluation.percentage.toFixed(1)}% - {getScoreLabel(evaluation.percentage)}
-          </Text>
+        {/* Progresso e estatísticas */}
+        <View style={styles.progressSection}>
+          <View style={styles.scoreContainer}>
+            <Text style={styles.scoreLabel}>Progresso atual:</Text>
+            <Text style={[styles.score, { color: getScoreColor(evaluation.percentage) }]}>
+              {evaluation.percentage.toFixed(1)}% - {getScoreLabel(evaluation.percentage)}
+            </Text>
+          </View>
+          
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{progressStats.answered}</Text>
+              <Text style={styles.statLabel}>Respondidas</Text>
+            </View>
+            <View style={styles.statSeparator} />
+            <View style={styles.statItem}>
+              <Text style={[styles.statNumber, styles.pendingNumber]}>{progressStats.pending}</Text>
+              <Text style={[styles.statLabel, styles.pendingLabel]}>Pendentes</Text>
+            </View>
+            <View style={styles.statSeparator} />
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>{progressStats.total}</Text>
+              <Text style={styles.statLabel}>Total</Text>
+            </View>
+          </View>
         </View>
       </View>
 
@@ -290,21 +325,45 @@ export default function ProjectEvaluationPage() {
               {categoryQuestions.map((question) => {
                 const answer = getAnswerForQuestion(question.id);
                 const isExpanded = expandedQuestions.has(question.id);
+                const isUnanswered = !answer;
                 
                 return (
-                  <View key={question.id} style={styles.questionCard}>
+                  <View 
+                    key={question.id} 
+                    style={[
+                      styles.questionCard,
+                      isUnanswered && styles.unansweredCard
+                    ]}
+                  >
                     <TouchableOpacity 
                       onPress={() => toggleQuestionExpansion(question.id)}
                       style={styles.questionHeader}
                     >
-                      <Text style={styles.questionText}>{question.question}</Text>
-                      <View style={styles.questionMeta}>
-                        <Text style={styles.weightText}>Peso: {question.weight}</Text>
-                        <Ionicons 
-                          name={isExpanded ? 'chevron-up' : 'chevron-down'} 
-                          size={20} 
-                          color="#64748b" 
-                        />
+                      <View style={styles.questionHeaderContent}>
+                        <View style={styles.questionTextContainer}>
+                          {isUnanswered && (
+                            <Ionicons 
+                              name="alert-circle" 
+                              size={18} 
+                              color="#ef4444" 
+                              style={styles.alertIcon}
+                            />
+                          )}
+                          <Text style={[
+                            styles.questionText,
+                            isUnanswered && styles.unansweredText
+                          ]}>
+                            {question.question}
+                          </Text>
+                        </View>
+                        <View style={styles.questionMeta}>
+                          <Text style={styles.weightText}>Peso: {question.weight}</Text>
+                          <Ionicons 
+                            name={isExpanded ? 'chevron-up' : 'chevron-down'} 
+                            size={20} 
+                            color="#64748b" 
+                          />
+                        </View>
                       </View>
                     </TouchableOpacity>
 
@@ -480,6 +539,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginBottom: 16,
   },
   projectInfo: {
     flex: 1,
@@ -516,6 +576,9 @@ const styles = StyleSheet.create({
     color: '#64748b',
     marginBottom: 2,
   },
+  progressSection: {
+    gap: 12,
+  },
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -528,6 +591,43 @@ const styles = StyleSheet.create({
   score: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8fafc',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1e293b',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  pendingNumber: {
+    color: '#ef4444',
+  },
+  pendingLabel: {
+    color: '#ef4444',
+  },
+  statSeparator: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#e2e8f0',
+    marginHorizontal: 16,
   },
   scrollView: {
     flex: 1,
@@ -557,14 +657,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
+  unansweredCard: {
+    backgroundColor: '#fef2f2',
+    borderLeftWidth: 4,
+    borderLeftColor: '#ef4444',
+  },
   questionHeader: {
     padding: 16,
+  },
+  questionHeaderContent: {
+    gap: 8,
+  },
+  questionTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  alertIcon: {
+    marginTop: 2,
   },
   questionText: {
     fontSize: 16,
     color: '#1e293b',
     lineHeight: 22,
-    marginBottom: 8,
+    flex: 1,
+  },
+  unansweredText: {
+    color: '#dc2626',
   },
   questionMeta: {
     flexDirection: 'row',
