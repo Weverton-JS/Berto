@@ -17,18 +17,10 @@ export default function RootLayout() {
           },
         }}
       >
-                <Stack.Screen 
-          name="index" 
-          options={{ 
-            title: 'RELATÓRIO DE INSPEÇÃO',
-            headerShown: true 
-          }} 
-        />
         <Stack.Screen 
-          name="create-project" 
+          name="(tabs)" 
           options={{ 
-            title: 'Novo Projeto',
-            presentation: 'modal' 
+            headerShown: false 
           }} 
         />
         <Stack.Screen 
