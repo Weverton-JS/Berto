@@ -14,10 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { useEvaluation } from '../hooks/useEvaluation';
-import { useProjects } from '../hooks/useProjects';
-import { SAFETY_QUESTIONS, CATEGORY_NAMES } from '../constants/SafetyQuestions';
-import ScoreButton from '../components/ui/ScoreButton';
+import { useEvaluation } from '../../hooks/useEvaluation';
+import { useProjects } from '../../hooks/useProjects';
+import { SAFETY_QUESTIONS, CATEGORY_NAMES } from '../../constants/SafetyQuestions';
+import ScoreButton from '../../components/ui/ScoreButton';
 
 export default function ProjectEvaluationPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -232,7 +232,7 @@ export default function ProjectEvaluationPage() {
     }
 
     try {
-      const PDFService = (await import('../services/PDFService')).default;
+      const PDFService = (await import('../../services/PDFService')).default;
       await PDFService.generatePDF(project, evaluation);
       showWebAlert('Sucesso!', 'Relatório PDF gerado e compartilhado com sucesso.');
     } catch (error) {
