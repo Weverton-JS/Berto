@@ -1,26 +1,87 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    primary: '#1e40af',
+    primaryContainer: '#eff6ff',
+    secondary: '#64748b',
+    tertiary: '#10b981',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    success: '#10b981',
+    surface: '#f8fafc',
+    surfaceVariant: '#f1f5f9',
+    outline: '#e2e8f0',
+    background: '#ffffff',
+    onBackground: '#1e293b',
+    onSurface: '#1e293b',
+    onPrimary: '#ffffff',
+    onSecondary: '#ffffff',
+    onError: '#ffffff',
+    text: '#1e293b',
+    textSecondary: '#64748b',
+    textDisabled: '#94a3b8',
+    border: '#e2e8f0',
+    placeholder: '#94a3b8',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    primary: '#3b82f6',
+    primaryContainer: '#1e40af',
+    secondary: '#94a3b8',
+    tertiary: '#34d399',
+    error: '#f87171',
+    warning: '#fbbf24',
+    success: '#34d399',
+    surface: '#1e293b',
+    surfaceVariant: '#334155',
+    outline: '#475569',
+    background: '#0f172a',
+    onBackground: '#f8fafc',
+    onSurface: '#f8fafc',
+    onPrimary: '#ffffff',
+    onSecondary: '#0f172a',
+    onError: '#0f172a',
+    text: '#f8fafc',
+    textSecondary: '#94a3b8',
+    textDisabled: '#64748b',
+    border: '#475569',
+    placeholder: '#64748b',
+  },
+};
+
+export const Spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  xxxl: 32,
+};
+
+export const BorderRadius = {
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+  round: 50,
+};
+
+export const Shadows = {
+  small: {
+    elevation: 1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  medium: {
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  large: {
+    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
 };

@@ -1,17 +1,22 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { ThemeProvider } from '../contexts/ThemeContext';
+import { PaperProvider } from 'react-native-paper';
+import { useAppTheme } from '../hooks/useTheme';
 
-export default function RootLayout() {
+function RootLayoutContent() {
+  const { theme, navigationTheme, isDarkMode } = useAppTheme();
+
   return (
-    <>
-      <StatusBar style="dark" />
+    <PaperProvider theme={theme}>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#1e40af',
+            backgroundColor: theme.colors.primary,
           },
-          headerTintColor: 'white',
+          headerTintColor: theme.colors.onPrimary,
           headerTitleStyle: {
             fontWeight: 'bold',
           },
@@ -26,10 +31,22 @@ export default function RootLayout() {
         <Stack.Screen 
           name="project/[id]" 
           options={{ 
-            title: 'Avaliação de Segurança' 
+            title: 'Avaliação de Segurança',
+            headerStyle: {
+              backgroundColor: theme.colors.primary,
+            },
+            headerTintColor: theme.colors.onPrimary,
           }} 
         />
       </Stack>
-    </>
+    </PaperProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutContent />
+    </ThemeProvider>
   );
 }
